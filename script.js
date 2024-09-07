@@ -4,6 +4,7 @@ const userName = document.querySelector("#username");
 const userSurname = document.querySelector("#usersurname");
 
 let BaseURL = "http://localhost:3001";
+let editingUserId = null;
 
 const getApiDataWithCallBack = async (endPoint, cb) => {
   let response = await fetch(`${BaseURL}/${endPoint}`).then((res) =>
@@ -15,8 +16,10 @@ const getApiDataWithCallBack = async (endPoint, cb) => {
 const PostApiData = async (endPoint, data) => {
   let response = fetch(`${BaseURL}/${endPoint}`, {
     method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
+
   return response;
 };
 
@@ -90,15 +93,11 @@ CREATE__USER &&
     try {
       if (editingUserId) {
         await UpdateApiDataById("data", editingUserId, userData);
-        editingUserId = null;
       } else {
-        await PostApiData("data", userData);
+        const result = await PostApiData("data", userData);
+        console.log("New user created:", result);
       }
-
-      getApiDataWithCallBack("data", renderData);
-      userName.value = "";
-      userSurname.value = "";
-    } catch {
-      console.error("Error processing user data");
+    } catch (error) {
+      console.error("Error processing user data:", error);
     }
   });
